@@ -3,6 +3,10 @@
 # Copyright:: Copyright (c) 2011 Jon Cowie
 # License:: GPL
 
+# Based on the knife chef plugin by:
+# Adam Jacob (<adam@opscode.com>)
+# Copyright:: Copyright (c) 2009 Opscode, Inc.
+
 require 'chef/knife'
 require 'chef/knife/core/node_presenter'
 
