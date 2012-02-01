@@ -2,6 +2,19 @@
 
 A preflight plugin for Chef::Knife which lets you see which nodes and roles use a particular cookbook before you upload it.
 
+# Installation
+
+## SCRIPT INSTALL
+
+Copy preflight.rb script from lib/chef/knife to your ~/.chef/plugins/knife directory.
+
+## GEM INSTALL
+knife-prelight is available on rubygems.org - if you have that source in your gemrc, you can simply use:
+
+````
+gem install knife-preflight
+````
+
 ## Preface
 
 Searches the expanded run_lists of all nodes along with the run_list of all roles for the specified cookbook
