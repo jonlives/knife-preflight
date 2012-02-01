@@ -10,7 +10,7 @@
 require 'chef/knife'
 require 'chef/knife/core/node_presenter'
 
-module Jonlives
+module KnifePreflight
   class Preflight < Chef::Knife
 
       deps do
@@ -57,10 +57,10 @@ module Jonlives
           ui.msg opt_parser
           exit 1
         end
-        
+
         q_nodes = Chef::Search::Query.new
-        
-        
+
+
         escaped_query = raw_query.sub( "::", "\\:\\:")
         node_query = "recipes:*#{escaped_query}"
         query_nodes = URI.escape(node_query,
@@ -70,7 +70,7 @@ module Jonlives
         result_count_nodes = 0
 
         ui.msg("Searching for nodes containing #{raw_query} in their expanded run_list...\n")
-        
+
         rows = config[:rows]
         start = config[:start]
         begin
@@ -97,11 +97,11 @@ module Jonlives
             output(item.name)
           end
         end
-        
+
         ui.msg("\n")
         ui.msg("\n")
-        
-        
+
+
         q_roles = Chef::Search::Query.new
         role_query = "run_list:recipe\\[#{escaped_query}\\]"
         query_roles = URI.escape(role_query,
@@ -138,7 +138,7 @@ module Jonlives
             output(role_item.name)
           end
         end
-        
+
         ui.msg("\n")
         ui.msg("\n")
         ui.msg("Found #{result_count_nodes} nodes and #{result_count_roles} roles using the specified search criteria")
