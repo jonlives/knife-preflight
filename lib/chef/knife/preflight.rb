@@ -60,16 +60,20 @@ module KnifePreflight
 
         q_nodes = Chef::Search::Query.new
 
-
         escaped_query = raw_query.sub( "::", "\\:\\:")
-        node_query = "recipes:*#{escaped_query}"
+        
+        if !raw_query.include? "::"
+          node_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query}\\:\\:default"
+          ui.msg("Searching for nodes containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
+        else
+          node_query = "recipes:*#{escaped_query}"
+          ui.msg("Searching for nodes containing #{raw_query} in their expanded run_list...\n")
+        end
         query_nodes = URI.escape(node_query,
                            Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 
         result_items_nodes = []
         result_count_nodes = 0
-
-        ui.msg("Searching for nodes containing #{raw_query} in their expanded run_list...\n")
 
         rows = config[:rows]
         start = config[:start]
