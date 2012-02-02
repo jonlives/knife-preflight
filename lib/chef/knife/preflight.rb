@@ -65,6 +65,9 @@ module KnifePreflight
         if !raw_query.include? "::"
           node_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query}\\:\\:default"
           ui.msg("Searching for nodes containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
+        elsif raw_query.include? "::default"
+          node_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query.gsub( "\\:\\:default","")}"
+          ui.msg("Searching for nodes containing #{raw_query} OR #{raw_query.gsub( "::default","")} in their expanded run_list...\n")
         else
           node_query = "recipes:*#{escaped_query}"
           ui.msg("Searching for nodes containing #{raw_query} in their expanded run_list...\n")
@@ -107,14 +110,23 @@ module KnifePreflight
 
 
         q_roles = Chef::Search::Query.new
-        role_query = "run_list:recipe\\[#{escaped_query}\\]"
+        
+        if !raw_query.include? "::"
+          role_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query}\\:\\:default\\]"
+          ui.msg("Searching for roles containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
+        elsif raw_query.include? "::default"
+          role_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query.gsub( "\\:\\:default","")}\\]"
+          ui.msg("Searching for roles containing #{raw_query} OR #{raw_query.gsub( "::default","")} in their expanded run_list...\n")
+        else
+          role_query = "run_list:recipe\\[#{escaped_query}\\]"
+          ui.msg("Searching for roles containing #{raw_query} in their expanded run_list...\n")
+        end
+
         query_roles = URI.escape(role_query,
                            Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 
         result_items_roles = []
         result_count_roles = 0
-
-        ui.msg("Searching for roles containing #{raw_query} in their run_list...\n")
 
         rows = config[:rows]
         start = config[:start]
