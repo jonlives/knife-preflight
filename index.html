@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Knife-preflight : Knife plugin for checking what your cookbook changes will affect" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Knife-preflight</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jonlives/knife-preflight">Fork Me on GitHub</a>
+
+          <h1 id="project_title">Knife-preflight</h1>
+          <h2 id="project_tagline">Knife plugin for checking what your cookbook changes will affect</h2>
+
+          <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/jonlives/knife-preflight/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/jonlives/knife-preflight/tarball/master">Download this project as a tar.gz file</a>
+          </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>knife-preflight</h1>
+
+<p>A preflight plugin for Chef::Knife which lets you see which nodes and roles use a particular cookbook before you upload it.</p>
+
+<h1>Installation</h1>
+
+<h2>SCRIPT INSTALL</h2>
+
+<p>Copy preflight.rb script from lib/chef/knife to your ~/.chef/plugins/knife directory.</p>
+
+<h2>GEM INSTALL</h2>
+
+<p>knife-prelight is available on rubygems.org - if you have that source in your gemrc, you can simply use:</p>
+
+<pre><code>gem install knife-preflight
+</code></pre>
+
+<h2>Preface</h2>
+
+<p>Searches the expanded run_lists of all nodes along with the run_list of all roles for the specified cookbook</p>
+
+<h2>What it does</h2>
+
+<p>knife preflight apache2::default
+will return a list of all nodes containing this cookbook in their expanded run_list followed by all nodes with the cookbook in their expanded run_list</p>
+
+<h2>Notes</h2>
+
+<p>This will currently only search for cookbooks. It won't work if you specify a role on the command line because I've tried to avoid duplication of functionality which knife makes obvious. </p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Knife-preflight maintained by <a href="https://github.com/jonlives">jonlives</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
