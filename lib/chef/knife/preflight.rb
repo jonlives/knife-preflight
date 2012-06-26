@@ -75,6 +75,7 @@ module KnifePreflight
         if !raw_query.include? "::"
           if type == 'node'
             search_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query}\\:\\:default"
+            search_query += " OR " + search_query.gsub("recipes", "last_seen_recipes")
           else
             search_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query}\\:\\:default\\]"
           end
@@ -82,6 +83,7 @@ module KnifePreflight
         else
           if type == 'node'
             search_query = "recipes:*#{escaped_query}"
+            search_query += " OR " + search_query.gsub("recipes", "last_seen_recipes")
           else
             search_query = "run_list:recipe\\[#{escaped_query}\\]"
           end
