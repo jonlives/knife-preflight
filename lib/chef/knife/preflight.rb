@@ -68,6 +68,8 @@ module KnifePreflight
       def perform_query(raw_query, type='node')
         q = Chef::Search::Query.new
 
+        # strip default if it exists to simplify logic
+        raw_query = raw_query.sub("::default", "")
         escaped_query = raw_query.sub( "::", "\\:\\:")
 
         if !raw_query.include? "::"
@@ -77,13 +79,6 @@ module KnifePreflight
             search_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query}\\:\\:default\\]"
           end
           ui.msg("Searching for #{type}s containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
-        elsif raw_query.include? "::default"
-          if type == 'node'
-            search_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query.gsub( "\\:\\:default","")}"
-          else
-            search_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query.gsub( "\\:\\:default","")}\\]"
-         end
-          ui.msg("Searching for #{type}s containing #{raw_query} OR #{raw_query.gsub( "::default","")} in their expanded run_list...\n")
         else
           if type == 'node'
             search_query = "recipes:*#{escaped_query}"
