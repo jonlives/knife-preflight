@@ -58,36 +58,53 @@ module KnifePreflight
           exit 1
         end
 
-        q_nodes = Chef::Search::Query.new
+        result_count_nodes = perform_query(raw_query, 'node')
 
+        result_count_roles = perform_query(raw_query, 'role')
+
+        ui.msg("Found #{result_count_nodes} nodes and #{result_count_roles} roles using the specified search criteria")
+      end
+
+      def perform_query(raw_query, type='node')
+        q = Chef::Search::Query.new
+
+        # strip default if it exists to simplify logic
+        raw_query = raw_query.sub("::default", "")
         escaped_query = raw_query.sub( "::", "\\:\\:")
-        
-        if !raw_query.include? "::"
-          node_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query}\\:\\:default"
-          ui.msg("Searching for nodes containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
-        elsif raw_query.include? "::default"
-          node_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query.gsub( "\\:\\:default","")}"
-          ui.msg("Searching for nodes containing #{raw_query} OR #{raw_query.gsub( "::default","")} in their expanded run_list...\n")
-        else
-          node_query = "recipes:*#{escaped_query}"
-          ui.msg("Searching for nodes containing #{raw_query} in their expanded run_list...\n")
-        end
-        query_nodes = URI.escape(node_query,
-                           Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 
-        result_items_nodes = []
-        result_count_nodes = 0
+        if !raw_query.include? "::"
+          if type == 'node'
+            search_query = "recipes:*#{escaped_query} OR recipes:*#{escaped_query}\\:\\:default"
+            search_query += " OR " + search_query.gsub("recipes", "last_seen_recipes")
+          else
+            search_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query}\\:\\:default\\]"
+          end
+          ui.msg("Searching for #{type}s containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
+        else
+          if type == 'node'
+            search_query = "recipes:*#{escaped_query}"
+            search_query += " OR " + search_query.gsub("recipes", "last_seen_recipes")
+          else
+            search_query = "run_list:recipe\\[#{escaped_query}\\]"
+          end
+          ui.msg("Searching for #{type}s containing #{raw_query} in their expanded run_list...\n")
+        end
+
+        query = URI.escape(search_query, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+
+        result_items = []
+        result_count = 0
 
         rows = config[:rows]
         start = config[:start]
         begin
-          q_nodes.search('node', query_nodes, config[:sort], start, rows) do |node_item|
-            formatted_item_node = format_for_display(node_item)
-            if formatted_item_node.respond_to?(:has_key?) && !formatted_item_node.has_key?('id')
-              formatted_item_node['id'] = node_item.has_key?('id') ? node_item['id'] : node_item.name
+          q.search(type, query, config[:sort], start, rows) do |item|
+            formatted_item = format_for_display(item)
+            if formatted_item.respond_to?(:has_key?) && !formatted_item.has_key?('id')
+              formatted_item['id'] = item.has_key?('id') ? item['id'] : item.name
             end
-            result_items_nodes << formatted_item_node
-            result_count_nodes += 1
+            result_items << formatted_item
+            result_count += 1
           end
         rescue Net::HTTPServerException => e
           msg = Chef::JSONCompat.from_json(e.response.body)["error"].first
@@ -96,68 +113,18 @@ module KnifePreflight
         end
 
         if ui.interchange?
-          output({:results => result_count_nodes, :rows => result_items_nodes})
+          output({:results => result_count, :rows => result_items})
         else
-          ui.msg "#{result_count_nodes} Nodes found"
+          ui.msg "#{result_count} #{type.capitalize}s found"
           ui.msg("\n")
-          result_items_nodes.each do |item|
+          result_items.each do |item|
             output(item.name)
           end
         end
 
         ui.msg("\n")
         ui.msg("\n")
-
-
-        q_roles = Chef::Search::Query.new
-        
-        if !raw_query.include? "::"
-          role_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query}\\:\\:default\\]"
-          ui.msg("Searching for roles containing #{raw_query} OR #{raw_query}::default in their expanded run_list...\n")
-        elsif raw_query.include? "::default"
-          role_query = "run_list:recipe\\[#{escaped_query}\\] OR run_list:recipe\\[#{escaped_query.gsub( "\\:\\:default","")}\\]"
-          ui.msg("Searching for roles containing #{raw_query} OR #{raw_query.gsub( "::default","")} in their expanded run_list...\n")
-        else
-          role_query = "run_list:recipe\\[#{escaped_query}\\]"
-          ui.msg("Searching for roles containing #{raw_query} in their expanded run_list...\n")
-        end
-
-        query_roles = URI.escape(role_query,
-                           Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-
-        result_items_roles = []
-        result_count_roles = 0
-
-        rows = config[:rows]
-        start = config[:start]
-        begin
-          q_roles.search('role', query_roles, config[:sort], start, rows) do |role_item|
-            formatted_item_role = format_for_display(role_item)
-            if formatted_item_role.respond_to?(:has_key?) && !formatted_item_role.has_key?('id')
-              formatted_item_role['id'] = role_item.has_key?('id') ? role_item['id'] : role_item.name
-            end
-            result_items_roles << formatted_item_role
-            result_count_roles += 1
-          end
-        rescue Net::HTTPServerException => e
-          msg = Chef::JSONCompat.from_json(e.response.body)["error"].first
-          ui.error("knife preflight failed: #{msg}")
-          exit 1
-        end
-
-        if ui.interchange?
-          output({:results => result_count_roles, :rows => result_items_roles})
-        else
-          ui.msg "#{result_count_roles} Roles found"
-          ui.msg("\n")
-          result_items_roles.each do |role_item|
-            output(role_item.name)
-          end
-        end
-
-        ui.msg("\n")
-        ui.msg("\n")
-        ui.msg("Found #{result_count_nodes} nodes and #{result_count_roles} roles using the specified search criteria")
+        return result_count
       end
     end
   end
