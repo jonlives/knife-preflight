@@ -104,7 +104,7 @@ module KnifePreflight
           ui.msg "#{result_count_nodes} Nodes found"
           ui.msg("\n")
           result_items_nodes.each do |item|
-            output("#{item.name}#{unconstrained_envs.include?(item.chef_environment) ? " - in environment #{item.chef_environment}, no version constraint for #{cookbook} cookbook" : nil}")
+            output("#{item.name}#{unconstrained_envs.include?(item.chef_environment) ? " - in environment '#{item.chef_environment}', no version constraint for '#{cookbook}' cookbook" : nil}")
           end
         end
 
