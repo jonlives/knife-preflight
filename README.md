@@ -22,7 +22,7 @@ Searches the expanded run_lists of all nodes along with the run_list of all role
 ## What it does
 
 knife preflight apache2::default
-will return a list of all nodes containing this cookbook in their expanded run_list followed by all nodes with the cookbook in their expanded run_list
+will return a list of all nodes containing this cookbook in their expanded run_list followed by all roles with the cookbook in their expanded run_list. It will warn if any nodes are in an environment which does not contain a version constraint for the cookbook being searched for.
 
 ## Notes
 This will currently only search for cookbooks. It won't work if you specify a role on the command line because I've tried to avoid duplication of functionality which knife makes obvious. 
