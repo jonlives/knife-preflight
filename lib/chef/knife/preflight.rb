@@ -87,7 +87,7 @@ module KnifePreflight
           q_nodes.search('node', query_nodes, config[:sort], start, rows) do |node_item|
             formatted_item_node = format_for_display(node_item)
             if formatted_item_node.respond_to?(:has_key?) && !formatted_item_node.has_key?('id')
-                formatted_item_node['id'] = node_item.has_key?('id') ? node_item['id'] : node_item.name
+                formatted_item_node.normal['id'] = node_item.has_key?('id') ? node_item['id'] : node_item.name
             end
             result_items_nodes << formatted_item_node
             result_count_nodes += 1
