@@ -1,10 +1,17 @@
-## 1.0.5 (25th January, 2013)
+## 0.1.7 (13th October, 2014)
+
+Features:
+
+    -  Adding back in logic to allow last_seen_recipes from https://github.com/jgoulah/knife-lastrun to be searched too
+
+
+## 0.1.5 (25th January, 2013)
 
 Features:
 
     -  Warns if nodes are in environments lacking a constraint for the cookbook being searched for
 
-## 1.0.4 (25th January, 2013)
+## 0.1.4 (25th January, 2013)
 
 Yanked
 
