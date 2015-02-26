@@ -1,3 +1,10 @@
+## 0.1.8 (26th February, 2015)
+
+Bugfixes:
+
+    -  Remove '*' prefix in search queries to avoid false positives (Thanks to @8la https://github.com/jonlives/knife-preflight/pull/9)
+
+
 ## 0.1.7 (13th October, 2014)
 
 Features:
