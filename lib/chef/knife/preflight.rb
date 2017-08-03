@@ -27,7 +27,7 @@ module KnifePreflight
     option :sort,
            :short => "-o SORT",
            :long => "--sort SORT",
-           :description => "The order to sort the results in",
+           :description => "The order to sort the results in (only in Chef < 13)",
            :default => nil
 
     option :start,
@@ -103,8 +103,11 @@ module KnifePreflight
 
       rows = config[:rows]
       start = config[:start]
+      args = { start: start, rows: rows }
+      # The sort attribute was removed in Chef 13, only add it on previous versions
+      args[:sort] = config[:sort] if Gem::Version.new(Chef::VERSION) < Gem::Version.new('13.0.0')
       begin
-        q.search(type, query, config[:sort], start, rows) do |item|
+        q.search(type, query, args) do |item|
           formatted_item = format_for_display(item)
           if formatted_item.respond_to?(:has_key?) && !formatted_item.has_key?('id')
             formatted_item.normal['id'] = item.has_key?('id') ? item['id'] : item.name
